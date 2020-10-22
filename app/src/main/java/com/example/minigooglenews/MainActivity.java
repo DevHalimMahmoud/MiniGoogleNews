@@ -6,41 +6,50 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
+    ArticlesData articlesData;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ArrayList<Source> sources = new ArrayList<>();
 
-        sources.add(new Source(1, "Binance"));
-        sources.add(new Source(1, "Binance"));
-        sources.add(new Source(1, "Binance"));
-        sources.add(new Source(1, "Binance"));
 
-        ArrayList<Article> articles = new ArrayList<>();
-
-        articles.add(new Article(sources, "Cointelegraph By Joseph Young", "3 reasons why Bitcoin suddenly dipped under $10K today — and recovered", "The price of Bitcoin briefly dropped below $10,000, causing the entire cryptocurrency market to slump in a short period.", "https://cointelegraph.com/news/3-reasons-why-bitcoin-suddenly-dipped-under-10k-today-and-recovered", "https://s3.cointelegraph.com/storage/uploads/view/4275d592b2b6ee0bceed726b684d83c5.jpg", "2020-09-05T15:21:00Z", "The price of Bitcoin (BTC) dropped to sub-$10,000 across major exchanges again on Sep. 5, marking two consecutive days of testing the crucial level. Other major cryptocurrencies, including Ethereums … [+3510 chars]"));
-        articles.add(new Article(sources, "Cointelegraph By Joseph Young", "3 reasons why Bitcoin suddenly dipped under $10K today — and recovered", "The price of Bitcoin briefly dropped below $10,000, causing the entire cryptocurrency market to slump in a short period.", "https://cointelegraph.com/news/3-reasons-why-bitcoin-suddenly-dipped-under-10k-today-and-recovered", "https://s3.cointelegraph.com/storage/uploads/view/4275d592b2b6ee0bceed726b684d83c5.jpg", "2020-09-05T15:21:00Z", "The price of Bitcoin (BTC) dropped to sub-$10,000 across major exchanges again on Sep. 5, marking two consecutive days of testing the crucial level. Other major cryptocurrencies, including Ethereums … [+3510 chars]"));
-        articles.add(new Article(sources, "Cointelegraph By Joseph Young", "3 reasons why Bitcoin suddenly dipped under $10K today — and recovered", "The price of Bitcoin briefly dropped below $10,000, causing the entire cryptocurrency market to slump in a short period.", "https://cointelegraph.com/news/3-reasons-why-bitcoin-suddenly-dipped-under-10k-today-and-recovered", "https://s3.cointelegraph.com/storage/uploads/view/4275d592b2b6ee0bceed726b684d83c5.jpg", "2020-09-05T15:21:00Z", "The price of Bitcoin (BTC) dropped to sub-$10,000 across major exchanges again on Sep. 5, marking two consecutive days of testing the crucial level. Other major cryptocurrencies, including Ethereums … [+3510 chars]"));
-        articles.add(new Article(sources, "Cointelegraph By Joseph Young", "3 reasons why Bitcoin suddenly dipped under $10K today — and recovered", "The price of Bitcoin briefly dropped below $10,000, causing the entire cryptocurrency market to slump in a short period.", "https://cointelegraph.com/news/3-reasons-why-bitcoin-suddenly-dipped-under-10k-today-and-recovered", "https://s3.cointelegraph.com/storage/uploads/view/4275d592b2b6ee0bceed726b684d83c5.jpg", "2020-09-05T15:21:00Z", "The price of Bitcoin (BTC) dropped to sub-$10,000 across major exchanges again on Sep. 5, marking two consecutive days of testing the crucial level. Other major cryptocurrencies, including Ethereums … [+3510 chars]"));
-        articles.add(new Article(sources, "Cointelegraph By Joseph Young", "3 reasons why Bitcoin suddenly dipped under $10K today — and recovered", "The price of Bitcoin briefly dropped below $10,000, causing the entire cryptocurrency market to slump in a short period.", "https://cointelegraph.com/news/3-reasons-why-bitcoin-suddenly-dipped-under-10k-today-and-recovered", "https://s3.cointelegraph.com/storage/uploads/view/4275d592b2b6ee0bceed726b684d83c5.jpg", "2020-09-05T15:21:00Z", "The price of Bitcoin (BTC) dropped to sub-$10,000 across major exchanges again on Sep. 5, marking two consecutive days of testing the crucial level. Other major cryptocurrencies, including Ethereums … [+3510 chars]"));
-
-        ArrayList<ArticlesData> articlesData=new ArrayList<>();
-        articlesData.add(new ArticlesData("ok",5195,articles));
-        articlesData.add(new ArticlesData("ok",5195,articles));
-        articlesData.add(new ArticlesData("ok",5195,articles));
-        articlesData.add(new ArticlesData("ok",5195,articles));
-        ItemArrayAdapter itemArrayAdapter = new ItemArrayAdapter(R.layout.news_list_item, articlesData);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(itemArrayAdapter);
+
+
+        IApi apiService = ApiClient.getClient().create(IApi.class);
+        Call<ArticlesData> call = apiService.getNews();
+
+        call.enqueue(new Callback<ArticlesData>() {
+            @Override
+            public void onResponse(Call<ArticlesData> call, Response<ArticlesData> response) {
+
+                assert response.body() != null;
+                ItemArrayAdapter itemArrayAdapter = new ItemArrayAdapter(R.layout.news_list_item, response.body());
+                articlesData=new ArticlesData(response.body().getStatus(),response.body().getTotalResults(),response.body().getArticles());
+
+                recyclerView.setAdapter(itemArrayAdapter);
+            }
+
+            @Override
+            public void onFailure(Call<ArticlesData> call, Throwable t) {
+                Log.d("TAG","Response = "+t.toString(),t);
+            }
+        });
 
     }
 }

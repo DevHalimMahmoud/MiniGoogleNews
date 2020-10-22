@@ -1,5 +1,7 @@
 package com.example.minigooglenews;
 
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 
 public class ArticlesData {
@@ -41,10 +43,10 @@ public class ArticlesData {
 }
 
 class Article {
-    private ArrayList<Source> sources;
+    private Source sources;
     private String author, title, description, url, urlToImage, publishedAt, content;
 
-    public Article(ArrayList<Source> sources, String author, String title, String description, String url, String urlToImage, String publishedAt, String content) {
+    public Article(Source sources, String author, String title, String description, String url, String urlToImage, String publishedAt, String content) {
         this.sources = sources;
         this.author = author;
         this.title = title;
@@ -55,11 +57,12 @@ class Article {
         this.content = content;
     }
 
-    public ArrayList<Source> getSources() {
+    @Nullable
+    public Source getSources() {
         return sources;
     }
 
-    public void setSources(ArrayList<Source> sources) {
+    public void setSources(Source sources) {
         this.sources = sources;
     }
 
@@ -123,22 +126,24 @@ class Article {
 }
 
 class Source {
-    private int id;
+    private String id;
     private String name;
 
-    public Source(int id, String name) {
+    public Source(String id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public int getId() {
+    @Nullable
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
+    @Nullable
     public String getName() {
         return name;
     }
